@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 현재 상태
 
-스캐폴드와 의존성만 설치된 상태이며 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 아직 Clerk 키가 없으므로 1단계(Clerk 인증)는 사용자가 `.env.local`에 키를 넣을 때까지 보류 상태다.
+스캐폴드·의존성 설치와 인증(1단계)만 끝난 상태이며 나머지 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 1단계(Clerk 인증)는 구현되어 있다: `src/proxy.ts`가 미로그인 요청을 차단하고(API는 401 JSON, 페이지는 `/sign-in`으로 rewrite), `/sign-in`의 `SignInGate`가 로그인 모달을 자동으로 연다. 페이지 차단은 layout이 아니라 반드시 proxy에서 한다(layout에서 children을 숨겨도 페이지 RSC 데이터가 응답에 포함됨).
 
 ## 명령어
 
@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Next.js 버전 주의사항
 
-Next 16 / React 19 / Tailwind v4를 사용한다. `AGENTS.md`는 이전 버전과 API·규칙이 다를 수 있다고 경고한다(예: `middleware` 이름이 바뀌었을 수 있음). Next 관련 코드를 쓰기 전에 `node_modules/next/dist/docs/`의 해당 가이드를 먼저 읽는다. PRD §9는 `src/middleware.ts`를 명시하지만, 현재 버전의 파일 규칙을 먼저 확인한다.
+Next 16 / React 19 / Tailwind v4를 사용한다. `AGENTS.md`는 이전 버전과 API·규칙이 다를 수 있다고 경고한다(예: `middleware` 이름이 바뀌었을 수 있음). Next 관련 코드를 쓰기 전에 `node_modules/next/dist/docs/`의 해당 가이드를 먼저 읽는다. Next 16에서 `middleware`는 `proxy`로 이름이 바뀌어 `src/proxy.ts`를 쓴다(PRD §9의 `middleware.ts`는 구버전 표기). Clerk v7에서는 `SignedIn`/`SignedOut` 대신 `<Show when="signed-in">`을 쓴다.
 
 ## 아키텍처 (PRD 기준)
 
