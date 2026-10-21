@@ -1,0 +1,33 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 현재 상태
+
+스캐폴드와 의존성만 설치된 상태이며 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 아직 Clerk 키가 없으므로 1단계(Clerk 인증)는 사용자가 `.env.local`에 키를 넣을 때까지 보류 상태다.
+
+## 명령어
+
+- `npm run dev` : 개발 서버 실행 (http://localhost:3000, 코드 수정 시 자동 반영)
+- `npm run build` : 프로덕션 빌드 생성. 배포 전 빌드 오류·타입 오류 확인에도 사용
+- `npm run start` : 빌드된 결과물로 프로덕션 서버 실행 (먼저 `npm run build` 필요)
+- `npm run lint` : ESLint로 코드 검사 (flat config, `eslint.config.mjs`)
+- `npx tsc --noEmit` : 파일을 생성하지 않고 TypeScript 타입 검사만 수행
+- `npm install <패키지>` / `npm install -D <패키지>` : 런타임 / 개발용 의존성 추가
+- DB 마이그레이션(`npx drizzle-kit generate`, `npx drizzle-kit migrate`) : `drizzle.config.ts`와 스키마(`src/db/schema.ts`)를 만든 뒤에 사용할 수 있다. 각각 마이그레이션 SQL 생성, Neon DB에 적용
+- 테스트 러너는 설정되어 있지 않다.
+
+## Next.js 버전 주의사항
+
+Next 16 / React 19 / Tailwind v4를 사용한다. `AGENTS.md`는 이전 버전과 API·규칙이 다를 수 있다고 경고한다(예: `middleware` 이름이 바뀌었을 수 있음). Next 관련 코드를 쓰기 전에 `node_modules/next/dist/docs/`의 해당 가이드를 먼저 읽는다. PRD §9는 `src/middleware.ts`를 명시하지만, 현재 버전의 파일 규칙을 먼저 확인한다.
+
+## 아키텍처 (PRD 기준)
+
+개인용 웹앱: RSS 수집(TechCrunch AI, The Verge AI) → Claude가 한국어로 번역·요약·분류 → 카드 UI → 선택적 Notion 저장.
+
+- 스택: Clerk 인증, Neon + Drizzle, `@anthropic-ai/sdk`(가볍고 빠른 모델), `rss-parser`, zod, Notion은 MCP(`@modelcontextprotocol/sdk` 클라이언트가 `@notionhq/notion-mcp-server`를 실행).
+- 모든 데이터는 사용자별로 분리한다. 모든 쿼리에 `userId` 조건을 걸고, 모든 API 라우트는 인증을 요구한다. 오류 형식은 `{ error: { code, message } }`.
+- Claude 호출은 기사 10건씩 묶어 JSON 구조화 출력으로 하고, zod로 검증하며 1회 재시도한다. 그래도 실패한 기사는 저장하지 않아 다음 수집 때 다시 시도된다. 카테고리를 삭제하면 해당 카테고리 기사만 남은 카테고리 중에서 재분류한다(실패 시 미분류로 두고 삭제는 진행).
+- Notion 전송 방식(로컬 stdio, Vercel 배포 시 원격 MCP)은 `src/lib/notion/mcpClient.ts` 한 곳에서만 결정한다.
+- 환경변수: `CLERK_*`, `DATABASE_URL`, `ANTHROPIC_API_KEY`, `NOTION_TOKEN`. Notion 저장 위치(DB/페이지)는 환경변수가 아니라 `user_settings`에 사용자별로 저장한다.
+- 수집 Route Handler에는 `maxDuration`을 설정한다.
