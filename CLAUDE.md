@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 현재 상태
 
-스캐폴드·의존성 설치와 인증(1단계)만 끝난 상태이며 나머지 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 1단계(Clerk 인증)는 구현되어 있다: `src/proxy.ts`가 미로그인 요청을 차단하고(API는 401 JSON, 페이지는 `/sign-in`으로 rewrite), `/sign-in`의 `SignInGate`가 로그인 모달을 자동으로 연다. 페이지 차단은 layout이 아니라 반드시 proxy에서 한다(layout에서 children을 숨겨도 페이지 RSC 데이터가 응답에 포함됨).
+스캐폴드·의존성 설치, 인증(1단계), DB 스키마·마이그레이션(2단계)까지 끝난 상태이며 나머지 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 1단계(Clerk 인증)는 구현되어 있다: `src/proxy.ts`가 미로그인 요청을 차단하고(API는 401 JSON, 페이지는 `/sign-in`으로 rewrite), `/sign-in`의 `SignInGate`가 로그인 모달을 자동으로 연다. 페이지 차단은 layout이 아니라 반드시 proxy에서 한다(layout에서 children을 숨겨도 페이지 RSC 데이터가 응답에 포함됨).
+
+2단계(DB)는 구현되어 있다: `src/db/schema.ts`에 `categories`, `articles`, `user_settings` 테이블이 있고, `src/db/index.ts`가 `@neondatabase/serverless` + `drizzle-orm/neon-http`로 `db`를 export한다. 마이그레이션은 `drizzle/`에 있으며 Neon `ai-news` 프로젝트에 적용되어 있다. 개발 확인용 예제 데이터(userId `user_example123`)가 들어 있는데, 실제 로그인 계정에는 보이지 않으므로 필요 없으면 지운다. 루트의 `.mcp.json`은 Claude Code에서 Neon MCP 서버를 쓰기 위한 설정이다.
 
 ## 명령어
 
@@ -14,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run lint` : ESLint로 코드 검사 (flat config, `eslint.config.mjs`)
 - `npx tsc --noEmit` : 파일을 생성하지 않고 TypeScript 타입 검사만 수행
 - `npm install <패키지>` / `npm install -D <패키지>` : 런타임 / 개발용 의존성 추가
-- DB 마이그레이션(`npx drizzle-kit generate`, `npx drizzle-kit migrate`) : `drizzle.config.ts`와 스키마(`src/db/schema.ts`)를 만든 뒤에 사용할 수 있다. 각각 마이그레이션 SQL 생성, Neon DB에 적용
+- DB 마이그레이션(`npx drizzle-kit generate`, `npx drizzle-kit migrate`) : 스키마(`src/db/schema.ts`) 변경 후 각각 마이그레이션 SQL 생성(`drizzle/`), Neon DB에 적용. `drizzle.config.ts`가 `.env.local`의 `DATABASE_URL`을 직접 로드한다
 - 테스트 러너는 설정되어 있지 않다.
 
 ## Next.js 버전 주의사항
