@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI News Collector",
+  title: "AI 뉴스 수집기",
   description: "해외 AI 뉴스를 한국어 요약 카드로 모아 보는 앱",
 };
 
@@ -29,7 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <body className="min-h-full flex flex-col">
           <Suspense fallback={null}>
             <Show when="signed-in">
-              <header className="flex justify-end p-4">
+              <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                  AI 뉴스 수집기
+                </span>
                 <UserButton />
               </header>
             </Show>
