@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 현재 상태
 
-스캐폴드·의존성 설치, 인증(1단계), DB 스키마·마이그레이션(2단계)까지 끝난 상태이며 나머지 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `PRD.md`가 기준 문서다. 그 순서를 따른다. 1단계(Clerk 인증)는 구현되어 있다: `src/proxy.ts`가 미로그인 요청을 차단하고(API는 401 JSON, 페이지는 `/sign-in`으로 rewrite), `/sign-in`의 `SignInGate`가 로그인 모달을 자동으로 연다. 페이지 차단은 layout이 아니라 반드시 proxy에서 한다(layout에서 children을 숨겨도 페이지 RSC 데이터가 응답에 포함됨).
+스캐폴드·의존성 설치, 인증(1단계), DB 스키마·마이그레이션(2단계)까지 끝난 상태이며 나머지 앱 코드는 아직 없다. 범위, 데이터 모델, API, 디렉토리 구조(§9), 구현 순서(§12)는 `doc/PRD.md`가 기준 문서다. 그 순서를 따른다. 화면 구성·스타일(Tailwind, 파란색 메인) 규칙은 `doc/ui.md`를 따른다. 1단계(Clerk 인증)는 구현되어 있다: `src/proxy.ts`가 미로그인 요청을 차단하고(API는 401 JSON, 페이지는 `/sign-in`으로 rewrite), `/sign-in`의 `SignInGate`가 로그인 모달을 자동으로 연다. 페이지 차단은 layout이 아니라 반드시 proxy에서 한다(layout에서 children을 숨겨도 페이지 RSC 데이터가 응답에 포함됨).
 
 2단계(DB)는 구현되어 있다: `src/db/schema.ts`에 `categories`, `articles`, `user_settings` 테이블이 있고, `src/db/index.ts`가 `@neondatabase/serverless` + `drizzle-orm/neon-http`로 `db`를 export한다. 마이그레이션은 `drizzle/`에 있으며 Neon `ai-news` 프로젝트에 적용되어 있다. 개발 확인용 예제 데이터(userId `user_example123`)가 들어 있는데, 실제 로그인 계정에는 보이지 않으므로 필요 없으면 지운다. 루트의 `.mcp.json`은 Claude Code에서 Neon MCP 서버를 쓰기 위한 설정이다.
 
@@ -33,3 +33,7 @@ Next 16 / React 19 / Tailwind v4를 사용한다. `AGENTS.md`는 이전 버전�
 - Notion 전송 방식(로컬 stdio, Vercel 배포 시 원격 MCP)은 `src/lib/notion/mcpClient.ts` 한 곳에서만 결정한다.
 - 환경변수: `CLERK_*`, `DATABASE_URL`, `ANTHROPIC_API_KEY`, `NOTION_TOKEN`. Notion 저장 위치(DB/페이지)는 환경변수가 아니라 `user_settings`에 사용자별로 저장한다.
 - 수집 Route Handler에는 `maxDuration`을 설정한다.
+
+## 문서 관리
+
+프로젝트 문서(`PRD.md`, `ui.md` 등 새로 만드는 md 파일)는 루트의 `doc/` 디렉토리에서 관리한다. 도구가 루트에서 읽는 `CLAUDE.md`, `AGENTS.md`, `README.md`만 루트에 둔다.
