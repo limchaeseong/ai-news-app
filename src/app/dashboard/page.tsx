@@ -3,8 +3,11 @@ import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { CategoryBar, UNCATEGORIZED } from "@/components/categories/CategoryBar";
 import { ArticleCard } from "@/components/news/ArticleCard";
+import { Pagination } from "@/components/news/Pagination";
 import { db } from "@/db";
 import { articles, categories } from "@/db/schema";
+
+const PAGE_SIZE = 9;
 
 export const metadata = { title: "대시보드 | AI 뉴스 수집기" };
 
@@ -31,7 +34,7 @@ export default async function DashboardPage({
         ? isNull(articles.categoryId)
         : eq(articles.categoryId, Number(selected));
 
-  const [categoryList, countRows, articleList] = await Promise.all([
+  const [categoryList, countRows] = await Promise.all([
     db
       .select()
       .from(categories)
@@ -42,18 +45,44 @@ export default async function DashboardPage({
       .from(articles)
       .where(eq(articles.userId, userId))
       .groupBy(articles.categoryId),
-    db
-      .select()
-      .from(articles)
-      .where(and(eq(articles.userId, userId), categoryFilter))
-      .orderBy(
-        sql`${articles.publishedAt} desc nulls last`,
-        desc(articles.fetchedAt),
-      ),
   ]);
 
   const counts = new Map(countRows.map((r) => [r.categoryId, r.n]));
   const total = countRows.reduce((sum, r) => sum + r.n, 0);
+
+  // 현재 필터에 해당하는 기사 수로 전체 페이지 수를 구하고, 범위를 벗어난 page는 보정한다.
+  const filteredTotal =
+    selected === undefined
+      ? total
+      : selected === UNCATEGORIZED
+        ? (counts.get(null) ?? 0)
+        : (counts.get(Number(selected)) ?? 0);
+  const totalPages = Math.max(1, Math.ceil(filteredTotal / PAGE_SIZE));
+  const rawPage = (await searchParams).page;
+  const requested =
+    typeof rawPage === "string" && /^\d+$/.test(rawPage) ? Number(rawPage) : 1;
+  const page = Math.min(Math.max(requested, 1), totalPages);
+
+  const articleList = await db
+    .select()
+    .from(articles)
+    .where(and(eq(articles.userId, userId), categoryFilter))
+    .orderBy(
+      sql`${articles.publishedAt} desc nulls last`,
+      desc(articles.fetchedAt),
+      desc(articles.id),
+    )
+    .limit(PAGE_SIZE)
+    .offset((page - 1) * PAGE_SIZE);
+
+  const hrefFor = (p: number) => {
+    const query = new URLSearchParams();
+    if (selected !== undefined) query.set("category", selected);
+    if (p > 1) query.set("page", String(p));
+    const qs = query.toString();
+    return qs ? `/dashboard?${qs}` : "/dashboard";
+  };
+
   const categoryNames = new Map(categoryList.map((c) => [c.id, c.name]));
 
   return (
@@ -88,6 +117,8 @@ export default async function DashboardPage({
           ))}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} hrefFor={hrefFor} />
     </main>
   );
 }
