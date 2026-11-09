@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { ClerkProvider, Show, UserButton } from "@clerk/nextjs";
+import { FetchNewsButton } from "@/components/news/FetchNewsButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,7 +34,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
                   AI 뉴스 수집기
                 </span>
-                <UserButton />
+                <div className="flex items-center gap-3">
+                  <FetchNewsButton />
+                  <UserButton />
+                </div>
               </header>
             </Show>
           </Suspense>
