@@ -20,6 +20,10 @@ export function SignInGate() {
       const { pathname, search } = window.location;
       window.location.replace(pathname.startsWith("/sign-in") ? "/" : pathname + search);
     } else {
+      // 로그아웃 상태가 되면 다음 로그인 때 다시 1회 새로고침할 수 있도록 표시를 지운다.
+      try {
+        sessionStorage.removeItem("signin-reload");
+      } catch {}
       openSignIn({});
     }
   }, [loaded, isSignedIn, openSignIn]);
