@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Category } from "@/db/schema";
+import { AddCategoryButton } from "./AddCategoryButton";
 
 export const UNCATEGORIZED = "uncategorized";
 
@@ -65,15 +66,7 @@ export function CategoryBar({ categories, counts, total, selected }: Props) {
         count={counts.get(null) ?? 0}
         active={selected === UNCATEGORIZED}
       />
-      {/* 카테고리 추가 폼/API(구현 순서 3단계) 전까지는 비활성화 */}
-      <button
-        type="button"
-        disabled
-        aria-label="카테고리 추가"
-        className="h-8 rounded-full border border-dashed border-blue-300 px-3 text-sm text-blue-700 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-950"
-      >
-        + 카테고리 추가
-      </button>
+      <AddCategoryButton />
     </nav>
   );
 }
