@@ -24,10 +24,12 @@ export function FetchNewsButton() {
         return;
       }
       const failed: string[] = data.failedSources ?? [];
+      const aiFailed: number = data.failed ?? 0;
       setResult({
-        tone: failed.length > 0 ? "warn" : "info",
+        tone: failed.length > 0 || aiFailed > 0 ? "warn" : "info",
         text:
           `${data.added}건 추가, ${data.skipped}건 중복` +
+          (aiFailed > 0 ? ` · ${aiFailed}건 처리 실패(다음에 재시도)` : "") +
           (failed.length > 0 ? ` · 실패: ${failed.join(", ")}` : ""),
       });
       router.refresh();
