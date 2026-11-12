@@ -1,4 +1,5 @@
 import type { Article } from "@/db/schema";
+import { SaveToNotionButton } from "./SaveToNotionButton";
 
 const dateFormat = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" });
 
@@ -41,14 +42,7 @@ export function ArticleCard({ article, categoryName }: Props) {
         >
           원문 보기 ↗
         </a>
-        {/* Notion 저장 연동(구현 순서 6단계) 전까지는 비활성화 */}
-        <button
-          type="button"
-          disabled
-          className="h-9 rounded-lg border border-slate-200 px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700"
-        >
-          Notion 저장
-        </button>
+        <SaveToNotionButton articleId={article.id} saved={article.notionPageId !== null} />
       </div>
     </article>
   );

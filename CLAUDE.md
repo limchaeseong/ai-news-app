@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 2단계(DB)는 구현되어 있다: `src/db/schema.ts`에 `categories`, `articles`, `user_settings` 테이블이 있고, `src/db/index.ts`가 `@neondatabase/serverless` + `drizzle-orm/neon-http`로 `db`를 export한다. 마이그레이션은 `drizzle/`에 있으며 Neon `ai-news` 프로젝트에 적용되어 있다. 개발 확인용 예제 데이터(userId `user_example123`)가 들어 있는데, 실제 로그인 계정에는 보이지 않으므로 필요 없으면 지운다. 루트의 `.mcp.json`은 Claude Code에서 Neon MCP 서버를 쓰기 위한 설정이다.
 
+Notion 저장(F6)은 구현되어 있다: 카드의 `SaveToNotionButton` → `POST /api/news/[id]/notion` → `src/lib/notion/saveArticle.ts`가 `mcpClient.ts`(로컬 stdio)로 `API-post-page`를 호출해 `NOTION_DATABASE_ID`의 DB(속성: 제목·원제목·출처·카테고리·발행일·원문 링크, 본문에 요약)에 저장하고 `articles.notionPageId`를 기록한다. 현재는 `user_settings`/설정 화면 없이 환경변수 `NOTION_API_TOKEN`, `NOTION_DATABASE_ID`를 쓴다.
+
 ## 명령어
 
 - `npm run dev` : 개발 서버 실행 (http://localhost:3000, 코드 수정 시 자동 반영)
