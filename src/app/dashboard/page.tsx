@@ -1,9 +1,20 @@
 import { auth } from "@clerk/nextjs/server";
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { CategoryBar, UNCATEGORIZED } from "@/components/categories/CategoryBar";
 import { ArticleCard } from "@/components/news/ArticleCard";
 import { Pagination } from "@/components/news/Pagination";
+import { SearchForm } from "@/components/news/SearchForm";
 import { db } from "@/db";
 import { articles, categories } from "@/db/schema";
 
@@ -34,6 +45,18 @@ export default async function DashboardPage({
         ? isNull(articles.categoryId)
         : eq(articles.categoryId, Number(selected));
 
+  // 검색어: 앞뒤 공백 제거, 최대 100자. LIKE 와일드카드(%, _, \)는 이스케이프한다.
+  const rawQ = (await searchParams).q;
+  const q = (typeof rawQ === "string" ? rawQ.trim() : "").slice(0, 100);
+  const pattern = `%${q.replace(/[\\%_]/g, "\\$&")}%`;
+  const searchFilter = q
+    ? or(
+        ilike(articles.titleKo, pattern),
+        ilike(articles.originalTitle, pattern),
+        ilike(articles.summaryKo, pattern),
+      )
+    : undefined;
+
   const [categoryList, countRows] = await Promise.all([
     db
       .select()
@@ -50,13 +73,12 @@ export default async function DashboardPage({
   const counts = new Map(countRows.map((r) => [r.categoryId, r.n]));
   const total = countRows.reduce((sum, r) => sum + r.n, 0);
 
-  // 현재 필터에 해당하는 기사 수로 전체 페이지 수를 구하고, 범위를 벗어난 page는 보정한다.
-  const filteredTotal =
-    selected === undefined
-      ? total
-      : selected === UNCATEGORIZED
-        ? (counts.get(null) ?? 0)
-        : (counts.get(Number(selected)) ?? 0);
+  // 현재 필터(카테고리 + 검색어)에 해당하는 기사 수로 전체 페이지 수를 구하고,
+  // 범위를 벗어난 page는 보정한다.
+  const [{ n: filteredTotal }] = await db
+    .select({ n: count() })
+    .from(articles)
+    .where(and(eq(articles.userId, userId), categoryFilter, searchFilter));
   const totalPages = Math.max(1, Math.ceil(filteredTotal / PAGE_SIZE));
   const rawPage = (await searchParams).page;
   const requested =
@@ -66,7 +88,7 @@ export default async function DashboardPage({
   const articleList = await db
     .select()
     .from(articles)
-    .where(and(eq(articles.userId, userId), categoryFilter))
+    .where(and(eq(articles.userId, userId), categoryFilter, searchFilter))
     .orderBy(
       sql`${articles.publishedAt} desc nulls last`,
       desc(articles.fetchedAt),
@@ -78,6 +100,7 @@ export default async function DashboardPage({
   const hrefFor = (p: number) => {
     const query = new URLSearchParams();
     if (selected !== undefined) query.set("category", selected);
+    if (q) query.set("q", q);
     if (p > 1) query.set("page", String(p));
     const qs = query.toString();
     return qs ? `/dashboard?${qs}` : "/dashboard";
@@ -87,20 +110,27 @@ export default async function DashboardPage({
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-12 sm:px-6">
-      <div className="mt-8">
-        <CategoryBar
-          categories={categoryList}
-          counts={counts}
-          total={total}
-          selected={selected}
-        />
+      <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+        <div className="min-w-0 flex-1">
+          <CategoryBar
+            categories={categoryList}
+            counts={counts}
+            total={total}
+            selected={selected}
+          />
+        </div>
+        <div className="w-full lg:w-80 lg:shrink-0">
+          <SearchForm query={q} category={selected} />
+        </div>
       </div>
 
       {articleList.length === 0 ? (
         <p className="mt-16 text-center text-slate-500 dark:text-slate-400">
           {total === 0
             ? "아직 수집된 뉴스가 없어요. 「뉴스 가져오기」를 눌러 시작하세요."
-            : "이 카테고리에는 뉴스가 없어요."}
+            : q
+              ? `「${q}」에 대한 검색 결과가 없어요.`
+              : "이 카테고리에는 뉴스가 없어요."}
         </p>
       ) : (
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

@@ -21,6 +21,12 @@ Notion 저장(F6)은 구현되어 있다: 카드의 `SaveToNotionButton` → `PO
 - DB 마이그레이션(`npx drizzle-kit generate`, `npx drizzle-kit migrate`) : 스키마(`src/db/schema.ts`) 변경 후 각각 마이그레이션 SQL 생성(`drizzle/`), Neon DB에 적용. `drizzle.config.ts`가 `.env.local`의 `DATABASE_URL`을 직접 로드한다
 - 테스트 러너는 설정되어 있지 않다.
 
+## 커스텀 명령어
+
+`.claude/commands/`에 프로젝트 전용 슬래시 명령어가 있다.
+
+- `/news-workflow <브랜치 이름>` : 새 기능 개발 워크플로우. main 확인 → 새 브랜치 생성(이름이 없으면 영어 소문자-하이픈 형식으로 제안) → 개발 시작 안내 및 CLAUDE.md 기반 스택·컨벤션 안내 → 사용자가 `완료`/`done`을 입력하면 변경 파일 목록과 커밋 메시지 제안, 확인 후 커밋하고 main에 병합 → 작업 요약. 병합 후 푸시는 하지 않는다.
+
 ## Next.js 버전 주의사항
 
 Next 16 / React 19 / Tailwind v4를 사용한다. `AGENTS.md`는 이전 버전과 API·규칙이 다를 수 있다고 경고한다(예: `middleware` 이름이 바뀌었을 수 있음). Next 관련 코드를 쓰기 전에 `node_modules/next/dist/docs/`의 해당 가이드를 먼저 읽는다. Next 16에서 `middleware`는 `proxy`로 이름이 바뀌어 `src/proxy.ts`를 쓴다(PRD §9의 `middleware.ts`는 구버전 표기). Clerk v7에서는 `SignedIn`/`SignedOut` 대신 `<Show when="signed-in">`을 쓴다.
