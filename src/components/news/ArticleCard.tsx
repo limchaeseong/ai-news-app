@@ -1,4 +1,5 @@
 import type { Article } from "@/db/schema";
+import { DeleteArticleButton } from "./DeleteArticleButton";
 import { SaveToNotionButton } from "./SaveToNotionButton";
 
 const dateFormat = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" });
@@ -12,8 +13,8 @@ export function ArticleCard({ article, categoryName }: Props) {
   const date = article.publishedAt ?? article.fetchedAt;
 
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
-      <div className="flex items-center justify-between gap-3">
+    <article className="relative flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-blue-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
+      <div className="flex items-center justify-between gap-3 pr-8">
         <span
           className={
             categoryName
@@ -44,6 +45,7 @@ export function ArticleCard({ article, categoryName }: Props) {
         </a>
         <SaveToNotionButton articleId={article.id} saved={article.notionPageId !== null} />
       </div>
+      <DeleteArticleButton articleId={article.id} />
     </article>
   );
 }
