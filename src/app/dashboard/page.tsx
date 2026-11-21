@@ -1,17 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
-import {
-  and,
-  asc,
-  count,
-  desc,
-  eq,
-  ilike,
-  isNull,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { CategoryBar, UNCATEGORIZED } from "@/components/categories/CategoryBar";
+import {
+  CategoryBar,
+  UNCATEGORIZED,
+} from "@/components/categories/CategoryBar";
 import { ArticleCard } from "@/components/news/ArticleCard";
 import { Pagination } from "@/components/news/Pagination";
 import { SearchForm } from "@/components/news/SearchForm";

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { ClerkProvider, Show, UserButton } from "@clerk/nextjs";
 import { FetchNewsButton } from "@/components/news/FetchNewsButton";
+import { HeaderNewsCount } from "@/components/news/HeaderNewsCount";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,9 +32,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Suspense fallback={null}>
             <Show when="signed-in">
               <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-                <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                  AI 뉴스 수집기
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                    AI 뉴스 수집기
+                  </span>
+                  <Suspense fallback={null}>
+                    <HeaderNewsCount />
+                  </Suspense>
+                </div>
                 <div className="flex items-center gap-3">
                   <FetchNewsButton />
                   <UserButton />
