@@ -115,3 +115,8 @@ doc/                           # 프로젝트 문서
 - [x] 카테고리 추가
 - [x] Notion 저장
 - [ ] 카테고리 수정·삭제, 설정 화면 등 나머지 기능은 `doc/PRD.md`의 구현 순서를 따릅니다.
+
+## 사용한 플러그인
+
+- Frontend Design: UI 디자인 품질 향상
+- commit-commands: 깃 워크플로 자동화
