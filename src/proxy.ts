@@ -6,11 +6,14 @@ import { NextResponse } from "next/server";
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
   const { userId } = await auth();
-  const isSignInPage = pathname === "/sign-in" || pathname.startsWith("/sign-in/");
+  const isSignInPage =
+    pathname === "/sign-in" || pathname.startsWith("/sign-in/");
 
-  // 이미 로그인한 사용자가 /sign-in에 오면 메인으로 보낸다.
+  // 이미 로그인한 사용자가 /sign-in에 오면 대시보드로 보낸다.
   if (userId) {
-    return isSignInPage ? NextResponse.redirect(new URL("/", req.url)) : undefined;
+    return isSignInPage
+      ? NextResponse.redirect(new URL("/dashboard", req.url))
+      : undefined;
   }
   // OAuth 콜백(/sign-in/sso-callback 등)도 통과시켜야 Clerk가 로그인을 마무리할 수 있다.
   if (isSignInPage) return;

@@ -18,7 +18,11 @@ export function SignInGate() {
         sessionStorage.setItem("signin-reload", "1");
       } catch {}
       const { pathname, search } = window.location;
-      window.location.replace(pathname.startsWith("/sign-in") ? "/" : pathname + search);
+      window.location.replace(
+        pathname.startsWith("/sign-in") || pathname === "/"
+          ? "/dashboard"
+          : pathname + search,
+      );
     } else {
       // 로그아웃 상태가 되면 다음 로그인 때 다시 1회 새로고침할 수 있도록 표시를 지운다.
       try {
@@ -32,7 +36,9 @@ export function SignInGate() {
     <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
       <h1 className="text-2xl font-semibold">AI News Collector</h1>
       {isSignedIn ? (
-        <p className="text-zinc-500">이동 중... 화면이 바뀌지 않으면 서버의 Clerk 설정을 확인하세요.</p>
+        <p className="text-zinc-500">
+          이동 중... 화면이 바뀌지 않으면 서버의 Clerk 설정을 확인하세요.
+        </p>
       ) : (
         <>
           <p className="text-zinc-500">로그인이 필요합니다.</p>
