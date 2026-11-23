@@ -36,7 +36,7 @@ export function DeleteArticleButton({ articleId }: Props) {
         disabled={loading}
         aria-label="뉴스 삭제"
         title="삭제"
-        className="inline-flex size-7 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-slate-800 dark:hover:text-red-400"
+        className="inline-flex size-7 items-center justify-center rounded-full text-slate-500 transition-opacity hover:bg-red-50 focus-visible:opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100 hover:text-red-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-100 dark:hover:bg-slate-800 dark:hover:text-red-400"
       >
         {loading ? (
           <span
@@ -44,13 +44,24 @@ export function DeleteArticleButton({ articleId }: Props) {
             className="size-3.5 animate-spin rounded-full border-2 border-slate-300 border-t-red-500"
           />
         ) : (
-          <svg aria-hidden viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          >
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         )}
       </button>
       {error && (
-        <span role="alert" className="rounded bg-white px-1 text-xs text-red-600 dark:bg-slate-900 dark:text-red-400">
+        <span
+          role="alert"
+          className="rounded bg-white px-1 text-xs text-red-600 dark:bg-slate-900 dark:text-red-400"
+        >
           {error}
         </span>
       )}

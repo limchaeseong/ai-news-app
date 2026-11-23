@@ -7,7 +7,7 @@
 
 - 스타일은 **Tailwind CSS v4** 유틸리티 클래스로만 작성한다. 별도 CSS 파일은 `src/app/globals.css`의 테마 토큰 외에는 만들지 않는다.
 - 모든 UI 문구는 한국어. `<html lang="ko">`.
-- 라이트/다크 모드는 `prefers-color-scheme`를 따른다. 색은 Tailwind `dark:` 변형으로 지정한다(색상표는 §2).
+- 라이트/다크 모드는 헤더의 전환 버튼(`ThemeToggle`)으로 사용자가 고른다. 선택은 `localStorage("theme")`에 저장하고, 저장값이 없으면 OS 설정(`prefers-color-scheme`)을 따른다. 다크 모드는 `<html class="dark">`로 켜며, `globals.css`의 `@custom-variant dark (&:where(.dark, .dark *));` 덕분에 색은 Tailwind `dark:` 변형으로 지정한다(색상표는 §2). 첫 페인트 전에 `layout.tsx`의 인라인 스크립트가 클래스를 붙여 깜빡임을 막는다. `globals.css`의 변형 설정을 바꾼 뒤에는 개발 서버를 재시작해야 반영된다.
 - 모바일 우선 반응형. 기본 스타일은 모바일, `sm:` `lg:`로 확장한다.
 - 컴포넌트는 `src/components/` 아래 `news/`, `categories/`, `settings/`, `ui/`로 나눈다. 재사용 가능한 버튼·배지 등은 `ui/`에 둔다.
 - 스크린 리더용 라벨(`aria-label`), 키보드 포커스 표시(`focus-visible:ring-2`)를 모든 버튼·링크에 둔다.
@@ -66,7 +66,8 @@
 ### 3.1 헤더
 
 - 좌측: 앱 이름 **AI 뉴스 수집기** (`text-xl font-bold text-slate-900 dark:text-slate-100`).
-- 우측: `뉴스 가져오기` 주요 버튼(`h-9 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400`), 그 옆에 Clerk `UserButton`.
+- 우측: `뉴스 가져오기` 주요 버튼(`h-9 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400`), 그 옆에 라이트/다크 전환 버튼(`ThemeToggle`, `size-9` 아이콘 버튼: 라이트일 때 달, 다크일 때 해, `aria-label="라이트/다크 모드 전환"`), 맨 끝에 Clerk `UserButton`.
+- Clerk 로그인 모달과 `UserButton` 메뉴는 Clerk 자체 테마라 전환 버튼을 따라가지 않는다.
 - 현재 `layout.tsx`의 헤더(`UserButton`만 있음)를 이 구성으로 확장한다. 로그인 상태(`<Show when="signed-in">`)에서만 표시한다.
 - `뉴스 가져오기` 클릭 중에는 비활성화하고 스피너와 `가져오는 중…` 문구를 보여준다.
 
@@ -133,4 +134,5 @@
 - [ ] 카테고리 바 + 맨 끝 `+ 카테고리 추가` 버튼
 - [ ] 뉴스 카드 컴포넌트(`components/news/`)와 반응형 그리드
 - [ ] 로딩·빈 상태·오류 상태
+- [ ] 헤더에 라이트/다크 전환 버튼, 새로고침 후에도 선택 유지
 - [ ] 라이트/다크 모드 확인, 모바일(≈375px) 확인

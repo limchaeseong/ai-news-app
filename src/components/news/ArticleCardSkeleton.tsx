@@ -14,7 +14,7 @@ export function ArticleCardSkeleton() {
       <div className={`mt-4 h-3.5 w-full ${bar}`} />
       <div className={`mt-2 h-3.5 w-full ${bar}`} />
       <div className={`mt-2 h-3.5 w-2/3 ${bar}`} />
-      <div className="mt-auto flex items-center justify-between">
+      <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
         <div className={`h-4 w-20 ${bar}`} />
         <div className={`h-7 w-24 ${bar}`} />
       </div>
