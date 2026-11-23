@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ClerkProvider, Show, UserButton } from "@clerk/nextjs";
 import { FetchNewsButton } from "@/components/news/FetchNewsButton";
 import { HeaderNewsCount } from "@/components/news/HeaderNewsCount";
+import { Footer } from "@/components/ui/Footer";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import "./globals.css";
 
@@ -59,6 +60,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Show>
           </Suspense>
           {children}
+          <Suspense fallback={null}>
+            <Show when="signed-in">
+              <Footer />
+            </Show>
+          </Suspense>
         </body>
       </html>
     </ClerkProvider>
